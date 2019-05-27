@@ -23,19 +23,10 @@ export default class PageWithScene extends React.Component<
   onSceneMount = async (e: SceneEventArgs) => {
     const { canvas, scene, engine } = e;
 
-    // Create simple sphere
-    const sphere = BABYLON.Mesh.CreateIcoSphere(
-      "sphere",
-      { radius: 0.2, flat: true, subdivisions: 1 },
-      scene
-    );
-    sphere.position.y = 3;
-    sphere.material = new BABYLON.StandardMaterial("sphere material", scene);
-
     // Lights and camera
     const light = new BABYLON.DirectionalLight(
       "light",
-      new BABYLON.Vector3(0, -0.5, 1.0),
+      new BABYLON.Vector3(0, 1, 1),
       scene
     );
     light.position = new BABYLON.Vector3(0, 5, -2);
@@ -57,23 +48,13 @@ export default class PageWithScene extends React.Component<
     });
     environment!.setMainColor(BABYLON.Color3.FromHexString("#74b9ff"));
 
-    // Shadows
-    const shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
-    shadowGenerator.useBlurExponentialShadowMap = true;
-    shadowGenerator.blurKernel = 32;
-    shadowGenerator.addShadowCaster(sphere, true);
-
     // Enable VR
     const vrHelper = scene.createDefaultVRExperience({
       createDeviceOrientationCamera: false
     });
     vrHelper.enableTeleportation({ floorMeshes: [environment!.ground!] });
 
-    // Runs every frame to rotate the sphere
     scene.onBeforeRenderObservable.add(() => {
-      sphere.rotation.y += 0.0001 * scene.getEngine().getDeltaTime();
-      sphere.rotation.x += 0.0001 * scene.getEngine().getDeltaTime();
-
       if (this.state.stream) {
         console.log("exist");
         createDesktop(e, this.state.stream);

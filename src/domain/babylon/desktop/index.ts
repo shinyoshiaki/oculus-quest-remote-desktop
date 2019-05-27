@@ -15,9 +15,6 @@ export default async function createDesktop(
     scene
   );
 
-  // Move the sphere upward 1/2 its height
-  ground.position.y = 1;
-
   const mat = new BABYLON.StandardMaterial("mat", scene);
 
   const videoTexture = await BABYLON.VideoTexture.CreateFromStreamAsync(
