@@ -5,7 +5,7 @@ import BabylonScene, { SceneEventArgs } from "../components/scene";
 import { History } from "history";
 import createDesktop from "../domain/babylon/desktop";
 import { join, create } from "../domain/webrtc/signaling";
-import { Vector3 } from "babylonjs";
+import { Vector3, OculusTouchController } from "babylonjs";
 
 export default class PageWithScene extends React.Component<
   { history: History },
@@ -53,6 +53,25 @@ export default class PageWithScene extends React.Component<
       createDeviceOrientationCamera: false
     });
     vrHelper.enableTeleportation({ floorMeshes: [environment!.ground!] });
+
+    vrHelper.onControllerMeshLoaded.add(webVRController => {
+      webVRController.onSecondaryButtonStateChangedObservable.add((data, state) => {
+        if (webVRController.hand === "right") {
+          if(data.pressed){
+            var impact = BABYLON.Mesh.CreatePlane("impact", 1, scene);
+            const mat = (impact.material = new BABYLON.StandardMaterial(
+              "impactMat",
+              scene
+            ));
+            impact.scaling = new Vector3(0.02, 0.02, 0.04);
+            mat.diffuseTexture = new BABYLON.Texture("textures/impact.png", scene);
+            mat.diffuseTexture.hasAlpha = true;
+            impact.position = new BABYLON.Vector3(0, 1, -0.1);
+
+          }
+        }
+      });
+    });
 
     scene.onBeforeRenderObservable.add(() => {
       if (this.state.stream) {
