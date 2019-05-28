@@ -9,11 +9,13 @@ export default async function createDesktop(
 
   console.log({ stream });
 
-  const ground = BABYLON.MeshBuilder.CreatePlane(
-    "ground1",
+  const desktop = BABYLON.MeshBuilder.CreatePlane(
+    "desktop",
     { width: 2 * 1.7, height: 2 },
     scene
   );
+  desktop.position = new BABYLON.Vector3(0, 1, 0);
+  desktop.rotation = new BABYLON.Vector3(0, 0, 0);
 
   const mat = new BABYLON.StandardMaterial("mat", scene);
 
@@ -26,10 +28,7 @@ export default async function createDesktop(
   videoTexture.vScale = -1;
 
   mat.diffuseTexture = videoTexture;
-  ground.material = mat;
-
-  ground.position = new BABYLON.Vector3(0, 3, 0);
-  ground.rotation = new BABYLON.Vector3(0, 0, 0);
+  desktop.material = mat;
 
   scene.onPointerUp = () => {
     videoTexture.video.play();

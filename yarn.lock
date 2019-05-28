@@ -2171,7 +2171,14 @@ babylon@^6.18.0:
   resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.18.0.tgz#af2f3b88fa6f5c1e4c634d1a0f8eac4f55b395e3"
   integrity sha512-q/UEjfGJ2Cm3oKV71DJz9d25TPnq5rhBVL2Q4fA5wcC3jcrdn7+SssEybFIxwAvvP+YCsCYNKughoF33GxgycQ==
 
-babylonjs@^4.0.3:
+babylonjs-gui@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/babylonjs-gui/-/babylonjs-gui-4.0.3.tgz#a3e15dd8b4c494dbaf9bc23d554f5ac4c37e64e9"
+  integrity sha512-6SvWXKd1xsKTuYDKG/OGXXc3EfPrMt3vykYdqqTngxA1smwj0LGLc2WGj3b6IXDSq9/lxQjhYlr+TlhQ6kuUqg==
+  dependencies:
+    babylonjs "4.0.3"
+
+babylonjs@4.0.3, babylonjs@^4.0.3:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/babylonjs/-/babylonjs-4.0.3.tgz#5dba9a96a7cb70634338e8dd7a17081e9f902cf6"
   integrity sha512-S5PoPmf0Vo03FDmF9z8djBiIm8GSLvCesln/9aKV9RbD4W+NTqVmMKhR8CQoMRCQNb2JSKKUuyUygXxCRVG37Q==
@@ -10674,7 +10681,7 @@ webpack@4.29.6:
 
 "webrtc4me@git+https://git@github.com/shinyoshiaki/webrtc4me.git":
   version "0.5.9"
-  resolved "git+https://git@github.com/shinyoshiaki/webrtc4me.git#b9ea5065d46b712677107bfdfb917b0ccc240a71"
+  resolved "git+https://git@github.com/shinyoshiaki/webrtc4me.git#3bf611b3c91ce19d03600d7f42935ef1ca8d7f7c"
   dependencies:
     rx.mini "git+https://git@github.com/shinyoshiaki/rx.mini.git"
     rxjs "^6.4.0"

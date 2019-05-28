@@ -1,9 +1,11 @@
 import React from "react";
 import * as BABYLON from "babylonjs";
+import * as GUI from "babylonjs-gui";
 import BabylonScene, { SceneEventArgs } from "../components/scene";
 import { History } from "history";
 import createDesktop from "../domain/babylon/desktop";
 import { join, create } from "../domain/webrtc/signaling";
+import { Vector3 } from "babylonjs";
 
 export default class PageWithScene extends React.Component<
   { history: History },
@@ -15,27 +17,25 @@ export default class PageWithScene extends React.Component<
   }
 
   connect = async () => {
-    const peer = await create("quest", false);
-    console.log({ peer });
-    this.setState({ stream: peer.remoteStream });
+    const peer = await join("quest", false);
+    peer.onAddTrack.subscribe(stream => {
+      this.setState({ stream });
+    });
   };
 
   onSceneMount = async (e: SceneEventArgs) => {
     const { canvas, scene, engine } = e;
 
     // Lights and camera
-    const light = new BABYLON.DirectionalLight(
-      "light",
-      new BABYLON.Vector3(0, 1, 1),
+    new BABYLON.HemisphericLight(
+      "sunLight",
+      new BABYLON.Vector3(0, 1, 0),
       scene
     );
-    light.position = new BABYLON.Vector3(0, 5, -2);
-    const camera = new BABYLON.ArcRotateCamera(
+
+    const camera = new BABYLON.FreeCamera(
       "camera",
-      -Math.PI / 2,
-      Math.PI / 4,
-      3,
-      new BABYLON.Vector3(0, 3, 0),
+      new BABYLON.Vector3(0, 1, -5),
       scene
     );
     camera.attachControl(canvas, true);
@@ -61,6 +61,35 @@ export default class PageWithScene extends React.Component<
         this.setState({ stream: undefined });
       }
     });
+
+    {
+      const desktop = BABYLON.MeshBuilder.CreatePlane(
+        "desktop",
+        { width: 2 * 1.7, height: 2 },
+        scene
+      );
+      desktop.position = new BABYLON.Vector3(0, 1, 0);
+      // Impact impostor
+      var impact = BABYLON.Mesh.CreatePlane("impact", 1, scene);
+      const mat = (impact.material = new BABYLON.StandardMaterial(
+        "impactMat",
+        scene
+      ));
+      impact.scaling = new Vector3(0.02, 0.02, 0.04);
+      mat.diffuseTexture = new BABYLON.Texture("textures/impact.png", scene);
+      mat.diffuseTexture.hasAlpha = true;
+      impact.position = new BABYLON.Vector3(0, 0, -0.1);
+
+      scene.onPointerDown = function(evt, pickResult) {
+        // if the click hits the ground object, we change the impact position
+        if (pickResult.hit) {
+          const { x, y } = pickResult!.pickedPoint!;
+          if (-1.7 < x && x < 1.7) impact.position.x = x;
+          if (0 < y && y < 2) impact.position.y = y;
+          console.log(impact.position);
+        }
+      };
+    }
 
     engine.runRenderLoop(() => {
       if (scene) {

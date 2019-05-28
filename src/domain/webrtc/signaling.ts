@@ -32,9 +32,9 @@ export function create(roomId: string, trickle: boolean) {
   });
 }
 
-export function join(roomId: string, trickle: boolean, stream?: MediaStream) {
+export function join(roomId: string, trickle: boolean) {
   return new Promise<WebRTC>(resolve => {
-    const rtc = new WebRTC({ nodeId: "offer", trickle, stream });
+    const rtc = new WebRTC({ nodeId: "offer", trickle });
     socket.emit("join", { roomId });
     socket.on("join", () => {
       rtc.makeOffer();
