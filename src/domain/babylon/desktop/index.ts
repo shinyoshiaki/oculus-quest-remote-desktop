@@ -3,6 +3,9 @@ import * as BABYLON from "babylonjs";
 import { Vector3 } from "babylonjs";
 import Event from "rx.mini";
 
+const vertical = 2;
+const horizontal = 1.7 * 2;
+
 export default async function createDesktop(
   e: SceneEventArgs,
   stream: MediaStream
@@ -13,7 +16,7 @@ export default async function createDesktop(
 
   const desktop = BABYLON.MeshBuilder.CreatePlane(
     "desktop",
-    { width: 2 * 1.7, height: 2 },
+    { width: horizontal, height: vertical },
     scene
   );
   desktop.position = new BABYLON.Vector3(0, 1, 0);
@@ -46,16 +49,15 @@ export default async function createDesktop(
     impact.scaling = new Vector3(0.02, 0.02, 0.04);
     mat.diffuseTexture = new BABYLON.Texture("textures/impact.png", scene);
     mat.diffuseTexture.hasAlpha = true;
-    impact.position = new BABYLON.Vector3(0, 0, -0.1);
+    impact.position = new BABYLON.Vector3(0, 0, -0.01);
 
     scene.onPointerDown = function(evt, pickResult) {
       if (pickResult.hit) {
         const { x, y } = pickResult!.pickedPoint!;
         if (-1.7 < x && x < 1.7) impact.position.x = x;
         if (0 < y && y < 2) impact.position.y = y;
-        console.log(impact.position);
-
-        event.execute({ x: x + 1.7, y });
+        const y1 = y / vertical;
+        event.execute({ x: (x + 1.7) / horizontal, y: 1 - y1 });
       }
     };
   }

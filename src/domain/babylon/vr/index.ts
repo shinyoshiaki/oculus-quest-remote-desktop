@@ -1,5 +1,5 @@
 import { SceneEventArgs } from "../../../components/scene";
-import { EnvironmentHelper } from "babylonjs";
+import { EnvironmentHelper, MeshBuilder } from "babylonjs";
 import Event from "rx.mini";
 
 export default function createVR(

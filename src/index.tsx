@@ -3,13 +3,11 @@ import ReactDOM from "react-dom";
 import { HashRouter, Route } from "react-router-dom";
 import App from "./pages/App";
 import * as serviceWorker from "./serviceWorker";
-import Cast from "./pages/Cast";
 
 ReactDOM.render(
   <HashRouter>
     <div>
       <Route exact path="/" component={App} />
-      <Route path="/cast" component={Cast} />
     </div>
   </HashRouter>,
   document.getElementById("root")

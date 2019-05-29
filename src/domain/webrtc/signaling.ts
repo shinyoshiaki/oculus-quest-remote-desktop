@@ -1,14 +1,8 @@
 import client from "socket.io-client";
 import WebRTC from "webrtc4me";
 
-const url =
-  process.env.NODE_ENV === "production"
-    ? "https://aqueous-earth-75182.herokuapp.com/"
-    : "https://aqueous-earth-75182.herokuapp.com/";
-
-const socket = client.connect(url);
-
-export function create(roomId: string, trickle: boolean) {
+export function create(url: string, roomId: string, trickle: boolean) {
+  const socket = client.connect(url);
   return new Promise<WebRTC>(resolve => {
     const rtc = new WebRTC({ nodeId: "answer", trickle });
     socket.emit("create", { roomId });
@@ -32,7 +26,8 @@ export function create(roomId: string, trickle: boolean) {
   });
 }
 
-export function join(roomId: string, trickle: boolean) {
+export function join(url: string, roomId: string, trickle: boolean) {
+  const socket = client.connect(url);
   return new Promise<WebRTC>(resolve => {
     const rtc = new WebRTC({ nodeId: "offer", trickle });
     socket.emit("join", { roomId });

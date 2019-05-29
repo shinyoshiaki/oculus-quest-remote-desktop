@@ -5,18 +5,28 @@ import { History } from "history";
 import createDesktop from "../domain/babylon/desktop";
 import { join, create } from "../domain/webrtc/signaling";
 import createVR from "../domain/babylon/vr";
+import WebRTC from "webrtc4me";
+import { MeshBuilder } from "babylonjs";
 
 export default class PageWithScene extends React.Component<
   { history: History },
-  { stream?: MediaStream }
+  { stream?: MediaStream; address: string }
 > {
   constructor(props: any) {
     super(props);
-    this.state = { stream: undefined };
+    this.state = { stream: undefined, address: "" };
   }
 
+  peer?: WebRTC;
+
   connect = async () => {
-    const peer = await join("quest", false);
+    const peer = await join(
+      "http://" + this.state.address + ":20000",
+      "quest",
+      false
+    );
+    this.peer = peer;
+    this.setState({ address: "" });
     peer.onAddTrack.subscribe(stream => {
       this.setState({ stream });
     });
@@ -45,12 +55,21 @@ export default class PageWithScene extends React.Component<
     });
     environment!.setMainColor(BABYLON.Color3.FromHexString("#74b9ff"));
 
-    createVR(e, environment!).subscribe(() => {});
+    createVR(e, environment!).subscribe(() => {
+      if (this.peer) {
+        this.peer.send(JSON.stringify({ type: "click" }));
+      }
+    });
 
     scene.onBeforeRenderObservable.add(() => {
       if (this.state.stream) {
+        createDesktop(e, this.state.stream).then(e =>
+          e.subscribe(pos => {
+            if (this.peer)
+              this.peer.send(JSON.stringify({ type: "move", payload: pos }));
+          })
+        );
         this.setState({ stream: undefined });
-        createDesktop(e, this.state.stream).then(e => e.subscribe(pos => {}));
       }
     });
 
@@ -63,13 +82,7 @@ export default class PageWithScene extends React.Component<
     return (
       <div>
         <div style={{ display: "flex" }}>
-          <button
-            onClick={() => {
-              this.props.history.push("cast");
-            }}
-          >
-            cast
-          </button>
+          <input onChange={e => this.setState({ address: e.target.value })} />
           <button onClick={this.connect}>connect</button>
         </div>
         <BabylonScene
