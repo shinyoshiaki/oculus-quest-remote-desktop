@@ -18,6 +18,7 @@ export default class PageWithScene extends React.Component<
   }
 
   peer?: WebRTC;
+  ref: any;
 
   connect = async () => {
     const peer = await join(
@@ -29,6 +30,7 @@ export default class PageWithScene extends React.Component<
     this.setState({ address: "" });
     peer.onAddTrack.subscribe(stream => {
       this.setState({ stream });
+      this.ref.srcObject = stream;
     });
   };
 
@@ -90,6 +92,7 @@ export default class PageWithScene extends React.Component<
           height={400}
           width={600}
         />
+        <video ref={ref => (this.ref = ref)} autoPlay={true} />
       </div>
     );
   }
