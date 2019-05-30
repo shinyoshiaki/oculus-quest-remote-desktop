@@ -3,10 +3,9 @@ import * as BABYLON from "babylonjs";
 import BabylonScene, { SceneEventArgs } from "../components/scene";
 import { History } from "history";
 import createDesktop from "../domain/babylon/desktop";
-import { join, create } from "../domain/webrtc/signaling";
+import { join } from "../domain/webrtc/signaling";
 import createVR from "../domain/babylon/vr";
 import WebRTC from "webrtc4me";
-import { MeshBuilder } from "babylonjs";
 
 export default class PageWithScene extends React.Component<
   { history: History },
@@ -29,6 +28,7 @@ export default class PageWithScene extends React.Component<
     this.peer = peer;
     this.setState({ address: "" });
     peer.onAddTrack.subscribe(stream => {
+      console.log(stream);
       this.setState({ stream });
       this.ref.srcObject = stream;
     });
@@ -92,7 +92,12 @@ export default class PageWithScene extends React.Component<
           height={400}
           width={600}
         />
-        <video ref={ref => (this.ref = ref)} autoPlay={true} />
+        <video
+          ref={ref => (this.ref = ref)}
+          autoPlay={true}
+          width={340}
+          height={200}
+        />
       </div>
     );
   }

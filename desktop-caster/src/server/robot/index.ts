@@ -18,6 +18,7 @@ export default function mouse() {
   });
 
   clickMouse.subscribe(() => {
+    console.log("left");
     robot.mouseClick("left");
   });
 }

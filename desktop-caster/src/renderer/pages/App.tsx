@@ -9,7 +9,7 @@ const Cast: FC = () => {
     const peer = await create("quest", false);
     console.log({ stream });
     peer.addTrack(stream.getVideoTracks()[0], stream);
-
+    peer.addTrack(stream.getAudioTracks()[0], stream);
     peer.onData.subscribe(msg => {
       console.log(msg);
       const data = JSON.parse(msg.data);

@@ -1,5 +1,5 @@
 import React, { FC, useEffect } from "react";
-import { getLocalDesktop, getScreen } from "../../domain/media";
+import { getScreen } from "../../domain/media";
 
 type Props = { onStream: (stream: MediaStream) => void };
 
@@ -19,7 +19,7 @@ const Display: FC<Props> = ({ onStream }) => {
   return (
     <div>
       <p>display</p>
-      <video ref={v => (desktopRef = v)} autoPlay={true} />
+      <video ref={v => (desktopRef = v)} autoPlay={true} muted={true} />
     </div>
   );
 };
