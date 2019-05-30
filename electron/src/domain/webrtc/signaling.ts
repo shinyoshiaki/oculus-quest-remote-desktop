@@ -1,7 +1,7 @@
 import client from "socket.io-client";
 import WebRTC from "../../lib/webrtc";
 
-const url = "http://localhost:20000";
+const url = "https://aqueous-earth-75182.herokuapp.com/";
 
 const socket = client.connect(url);
 
