@@ -21,8 +21,8 @@ export default class PageWithScene extends React.Component<
 
   connect = async () => {
     const peer = await join(
-      "http://" + this.state.address + ":20000",
-      "quest",
+      "https://aqueous-earth-75182.herokuapp.com/",
+      this.state.address,
       false
     );
     this.peer = peer;
