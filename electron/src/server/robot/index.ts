@@ -1,5 +1,6 @@
 import robotjs from "robotjs";
 import Event from "rx.mini";
+console.log(window);
 const load = (window as any).require;
 const robot: typeof robotjs = load("robotjs");
 

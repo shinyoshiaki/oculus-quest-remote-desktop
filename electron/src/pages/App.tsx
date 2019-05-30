@@ -2,7 +2,7 @@ import React, { FC } from "react";
 import Display from "../components/display";
 import { create } from "../domain/webrtc/signaling";
 import ShowIP from "../components/showip";
-import { moveMouse, clickMouse } from "../../server/robot";
+import { moveMouse, clickMouse } from "../server/robot";
 
 const Cast: FC = () => {
   const onStream = async (stream: MediaStream) => {

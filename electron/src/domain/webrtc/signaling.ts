@@ -1,5 +1,5 @@
 import client from "socket.io-client";
-import WebRTC from "../../../lib/webrtc";
+import WebRTC from "../../lib/webrtc";
 
 const url = "http://localhost:20000";
 
