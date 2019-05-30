@@ -1,1 +1,1 @@
-https://shinyoshiaki.github.io/react-babylon-vr/build/
+https://shinyoshiaki.github.io/oculus-quest-remote-desktop/build/
