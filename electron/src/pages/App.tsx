@@ -11,7 +11,7 @@ function getRandomInt(min: number, max: number) {
 }
 
 const Cast: FC = () => {
-  const [room, setroom] = useState(getRandomInt(0, 1000000).toString());
+  const [room, setroom] = useState(getRandomInt(1000000, 10000000).toString());
 
   const onStream = async (stream: MediaStream) => {
     const peer = await create(room, false);
