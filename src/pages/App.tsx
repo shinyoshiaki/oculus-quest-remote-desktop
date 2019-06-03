@@ -6,14 +6,25 @@ import createDesktop from "../domain/babylon/desktop";
 import { join } from "../domain/webrtc/signaling";
 import createVR from "../domain/babylon/vr";
 import WebRTC from "webrtc4me";
+import Plane from "../domain/babylon/components/plane";
+import { Vector3 } from "babylonjs";
 
 export default class PageWithScene extends React.Component<
   { history: History },
-  { stream?: MediaStream; address: string }
+  {
+    stream?: MediaStream;
+    address: string;
+    args?: SceneEventArgs;
+    rotate: Vector3;
+  }
 > {
   constructor(props: any) {
     super(props);
-    this.state = { stream: undefined, address: "" };
+    this.state = {
+      stream: undefined,
+      address: "",
+      rotate: new Vector3(0, 0, 0)
+    };
   }
 
   peer?: WebRTC;
@@ -78,9 +89,12 @@ export default class PageWithScene extends React.Component<
     engine.runRenderLoop(() => {
       if (scene) scene.render();
     });
+
+    this.setState({ args: e });
   };
 
   render() {
+    let { args, rotate } = this.state;
     return (
       <div>
         <div style={{ display: "flex" }}>
@@ -92,6 +106,31 @@ export default class PageWithScene extends React.Component<
           height={400}
           width={600}
         />
+        {args && (
+          <div>
+            <Plane
+              scene={args.scene}
+              name="sex"
+
+              position={this.state.rotate}
+              onMount={mesh => {
+                let i = 0;
+                setInterval(() => {
+                  this.setState({
+                    ...this.state,
+                    rotate: new Vector3(i++/10, 0, 0)
+                  });
+                  console.log(this.state.rotate, i);
+                }, 1000);
+              }}
+            />
+            <Plane
+              scene={args.scene}
+              name="sex1"
+              position={new Vector3(1, 0, 0)}
+            />
+          </div>
+        )}
         <video
           ref={ref => (this.ref = ref)}
           autoPlay={true}
