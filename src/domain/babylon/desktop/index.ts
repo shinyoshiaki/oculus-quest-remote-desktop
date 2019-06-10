@@ -3,14 +3,15 @@ import * as BABYLON from "babylonjs";
 import { Vector3 } from "babylonjs";
 import Event from "rx.mini";
 
-const vertical = 2;
-const horizontal = 1.7 * 2;
-
 export default async function createDesktop(
   e: SceneEventArgs,
-  stream: MediaStream
+  stream: MediaStream,
+  ratio?: { vertical: number; horizontal: number }
 ) {
   const { canvas, scene, engine } = e;
+
+  const vertical = ratio ? ratio.vertical : 2;
+  const horizontal = ratio ? ratio.horizontal : 1.7 * 2;
 
   console.log({ stream });
 
@@ -19,7 +20,7 @@ export default async function createDesktop(
     { width: horizontal, height: vertical },
     scene
   );
-  desktop.position = new BABYLON.Vector3(0, 1, 0);
+  desktop.position = new BABYLON.Vector3(0, vertical / 2, 0);
   desktop.rotation = new BABYLON.Vector3(0, 0, 0);
 
   const mat = new BABYLON.StandardMaterial("mat", scene);

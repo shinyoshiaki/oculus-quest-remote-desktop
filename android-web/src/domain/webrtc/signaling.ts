@@ -1,5 +1,5 @@
 import client from "socket.io-client";
-import WebRTC from "../../lib/webrtc";
+import WebRTC from "webrtc4me";
 
 const url = "https://aqueous-earth-75182.herokuapp.com/";
 
@@ -38,7 +38,7 @@ export function join(roomId: string, trickle: boolean) {
       rtc.setSdp(data.sdp);
     });
 
-    const onSignal = rtc.onSignal.subscribe((sdp: any) => {
+    const onSignal = rtc.onSignal.subscribe(sdp => {
       console.log({ sdp, roomId });
       socket.emit("sdp", { sdp, roomId });
     });

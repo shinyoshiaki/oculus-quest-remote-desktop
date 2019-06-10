@@ -65,7 +65,10 @@ export default class PageWithScene extends React.Component<
 
     scene.onBeforeRenderObservable.add(() => {
       if (this.state.stream) {
-        createDesktop(e, this.state.stream).then(e =>
+        createDesktop(e, this.state.stream, {
+          vertical: 2 * 1.7,
+          horizontal: 2
+        }).then(e =>
           e.subscribe(pos => {
             if (this.peer)
               this.peer.send(JSON.stringify({ type: "move", payload: pos }));
