@@ -11,14 +11,14 @@ function getRandomInt(min: number, max: number) {
 }
 
 const Cast: FC = () => {
-  const [room, setroom] = useState(getRandomInt(1000000, 10000000).toString());
+  const [room, _] = useState(getRandomInt(1000000, 10000000).toString());
 
   const onStream = async (stream: MediaStream) => {
     const peer = await create(room, false);
     console.log({ stream });
     peer.addTrack(stream.getVideoTracks()[0], stream);
     peer.addTrack(stream.getAudioTracks()[0], stream);
-    peer.onData.subscribe(msg => {
+    peer.onData.subscribe((msg: any) => {
       console.log(msg);
       const data = JSON.parse(msg.data);
       switch (data.type) {

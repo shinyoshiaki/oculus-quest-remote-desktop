@@ -14,7 +14,7 @@ export function create(roomId: string, trickle: boolean) {
       rtc.setSdp(data.sdp);
     });
 
-    const onSignal = rtc.onSignal.subscribe(sdp => {
+    const onSignal = rtc.onSignal.subscribe((sdp: any) => {
       console.log({ sdp, roomId });
       socket.emit("sdp", { sdp, roomId });
     });
@@ -22,9 +22,6 @@ export function create(roomId: string, trickle: boolean) {
       console.log("connect");
       onSignal.unSubscribe();
       resolve(rtc);
-    });
-    rtc.onData.subscribe(message => {
-      console.log({ message });
     });
   });
 }
@@ -41,7 +38,7 @@ export function join(roomId: string, trickle: boolean) {
       rtc.setSdp(data.sdp);
     });
 
-    const onSignal = rtc.onSignal.subscribe(sdp => {
+    const onSignal = rtc.onSignal.subscribe((sdp: any) => {
       console.log({ sdp, roomId });
       socket.emit("sdp", { sdp, roomId });
     });
@@ -49,9 +46,6 @@ export function join(roomId: string, trickle: boolean) {
       console.log("connect");
       resolve(rtc);
       onSignal.unSubscribe();
-    });
-    rtc.onData.subscribe(message => {
-      console.log({ message });
     });
   });
 }
