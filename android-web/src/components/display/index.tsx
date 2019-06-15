@@ -13,7 +13,7 @@ const Display: FC<Props> = ({ onStream }) => {
       onStream(stream);
     };
     init();
-  }, [onStream]);
+  }, []);
 
   return (
     <div>
