@@ -1,107 +1,77 @@
-import React from "react";
-import * as BABYLON from "babylonjs";
-import BabylonScene, { SceneEventArgs } from "../components/scene";
-import { History } from "history";
-import createDesktop from "../domain/babylon/desktop";
-import { join } from "../domain/webrtc/signaling";
-import createVR from "../domain/babylon/vr";
-import WebRTC from "webrtc4me";
+import React, { useRef, useState } from "react";
 
-export default class PageWithScene extends React.Component<
-  { history: History },
-  { stream?: MediaStream; address: string }
-> {
-  constructor(props: any) {
-    super(props);
-    this.state = { stream: undefined, address: "" };
-  }
+import SceneCreate, { SceneEventArgs } from "../domain/babylon/scene";
+import { Vector3, HemisphericLight, FreeCamera } from "@babylonjs/core";
+import useInput from "../hooks/useInput";
+import { webrtcService } from "../services/webrtc";
+import Desktop from "../domain/babylon/desktop";
+import Event from "rx.mini";
+import VR from "../domain/babylon/vr";
 
-  peer?: WebRTC;
-  ref: any;
+const App: React.FC = () => {
+  const [room, setroom, clearroom] = useInput();
+  const ref = useRef<any>(null);
+  const [stream, setstream] = useState<MediaStream>();
+  const [mouseMoveEvent] = useState(new Event<{ x: number; y: number }>());
+  const [mouseClickEvent] = useState(new Event());
 
-  connect = async () => {
-    const peer = await join(
-      "https://aqueous-earth-75182.herokuapp.com/",
-      this.state.address,
-      false
-    );
-    this.peer = peer;
-    this.setState({ address: "" });
-    peer.onAddTrack.subscribe(stream => {
-      console.log(stream);
-      this.setState({ stream });
-      this.ref.srcObject = stream;
-    });
-  };
-
-  onSceneMount = async (e: SceneEventArgs) => {
+  const onSceneMount = (e: SceneEventArgs) => {
     const { canvas, scene, engine } = e;
 
-    new BABYLON.HemisphericLight(
-      "sunLight",
-      new BABYLON.Vector3(0, 1, 0),
-      scene
-    );
+    new HemisphericLight("sunLight", new Vector3(0, 1, 0), scene);
 
-    const camera = new BABYLON.FreeCamera(
-      "camera",
-      new BABYLON.Vector3(0, 1, -5),
-      scene
-    );
+    const camera = new FreeCamera("camera", new Vector3(0, 1, -2), scene);
     camera.attachControl(canvas, true);
     (scene.activeCamera as any).beta += 0.8;
 
-    const environment = scene.createDefaultEnvironment({
-      enableGroundShadow: true,
-      groundYBias: 1
-    });
-    environment!.setMainColor(BABYLON.Color3.FromHexString("#74b9ff"));
+    mouseMoveEvent.subscribe(pos =>
+      webrtcService.peer.send(JSON.stringify({ type: "move", payload: pos }))
+    );
 
-    createVR(e, environment!).subscribe(() => {
-      if (this.peer) {
-        this.peer.send(JSON.stringify({ type: "click" }));
-      }
-    });
-
-    scene.onBeforeRenderObservable.add(() => {
-      if (this.state.stream) {
-        createDesktop(e, this.state.stream, {
-          vertical: 2 * 1.7,
-          horizontal: 2
-        }).then(e =>
-          e.subscribe(pos => {
-            if (this.peer)
-              this.peer.send(JSON.stringify({ type: "move", payload: pos }));
-          })
-        );
-        this.setState({ stream: undefined });
-      }
-    });
+    mouseClickEvent.subscribe(() =>
+      webrtcService.peer.send(JSON.stringify({ type: "click" }))
+    );
 
     engine.runRenderLoop(() => {
-      if (scene) scene.render();
+      scene.render();
     });
   };
 
-  render() {
-    return (
-      <div>
-        <div style={{ display: "flex" }}>
-          <input onChange={e => this.setState({ address: e.target.value })} />
-          <button onClick={this.connect}>connect</button>
-        </div>
-        <BabylonScene
-          onSceneMount={this.onSceneMount}
-          height={400}
-          width={600}
-        />
-        <video
-          ref={ref => (this.ref = ref)}
-          autoPlay={true}
-          width={340}
-          height={200}
-        />
-      </div>
+  const connect = async () => {
+    await webrtcService.join(
+      "https://aqueous-earth-75182.herokuapp.com/",
+      room,
+      false
     );
-  }
-}
+    clearroom();
+    webrtcService.peer.onAddTrack.subscribe(ms => {
+      setstream(ms);
+      ref.current = ms;
+    });
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex" }}>
+        <input onChange={setroom} value={room} />
+        <button onClick={connect}>connect</button>
+      </div>
+      <SceneCreate onSceneMount={onSceneMount} height={400} width={600}>
+        <VR event={mouseClickEvent} />
+        {stream && (
+          <Desktop
+            stream={stream}
+            ratio={{
+              vertical: 2,
+              horizontal: 2 * 1.7
+            }}
+            mouseMoveEvent={mouseMoveEvent}
+          />
+        )}
+      </SceneCreate>
+      <video ref={ref} autoPlay={true} width={340} height={200} />
+    </div>
+  );
+};
+
+export default App;
