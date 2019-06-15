@@ -16,7 +16,7 @@ const App: React.FC = () => {
   const [mouseClickEvent] = useState(new Event());
 
   const onSceneMount = (e: SceneEventArgs) => {
-    const { canvas, scene, engine } = e;
+    const { canvas, scene } = e;
 
     new HemisphericLight("sunLight", new Vector3(0, 1, 0), scene);
 
@@ -31,10 +31,6 @@ const App: React.FC = () => {
     mouseClickEvent.subscribe(() =>
       webrtcService.peer.send(JSON.stringify({ type: "click" }))
     );
-
-    engine.runRenderLoop(() => {
-      scene.render();
-    });
   };
 
   const connect = async () => {

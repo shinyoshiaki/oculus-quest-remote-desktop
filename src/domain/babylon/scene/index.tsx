@@ -48,6 +48,9 @@ const SceneCreate: FC<Props> = ({
         };
         onSceneMount(ready);
         setcontext(ready);
+        engine.runRenderLoop(() => {
+          scene.render();
+        });
       }
     }
   }, [canvasRef]);

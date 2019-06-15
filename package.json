@@ -21,6 +21,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "type": "tsc --noEmit",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prod": "npm run build && cd electron && npm run packager"
