@@ -10,7 +10,7 @@ import VR from "../domain/babylon/vr";
 
 const App: React.FC = () => {
   const [room, setroom, clearroom] = useInput();
-  const ref = useRef<any>(null);
+  const ref = useRef<any>();
   const [stream, setstream] = useState<MediaStream>();
   const [mouseMoveEvent] = useState(new Event<{ x: number; y: number }>());
   const [mouseClickEvent] = useState(new Event());
@@ -46,7 +46,8 @@ const App: React.FC = () => {
     clearroom();
     webrtcService.peer.onAddTrack.subscribe(ms => {
       setstream(ms);
-      ref.current = ms;
+      console.log(ms);
+      ref.current.srcObject = ms;
     });
   };
 
