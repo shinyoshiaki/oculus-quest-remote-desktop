@@ -55,7 +55,8 @@ const VR: FC<{
       });
       scene.onBeforeRenderObservable.add(() => {
         const pos = vrHelper.webVRCamera.devicePosition.clone();
-        vrPositionEvent.execute({ pos });
+        const qua = vrHelper.webVRCamera.deviceRotationQuaternion.clone();
+        vrPositionEvent.execute({ pos, qua });
       });
 
       const props = { cotrollerActionEvent, vrPositionEvent };

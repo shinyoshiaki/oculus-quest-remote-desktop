@@ -27,9 +27,10 @@ const Keyboard: FC<{ props?: OnMountProps }> = ({ props }) => {
 
       cotrollerActionEvent.subscribe(async ({ hand }) => {
         if (hand === "left") {
-          const { pos } = await vrPositionEvent.asPromise();
+          const { pos, qua } = await vrPositionEvent.asPromise();
           plane.position = pos;
-          plane.translate(new Vector3(0, 0.2, 0.5), 1);
+          plane.rotationQuaternion = qua;
+          plane.translate(new Vector3(0, 0, 0.6), 1);
         }
       });
 
