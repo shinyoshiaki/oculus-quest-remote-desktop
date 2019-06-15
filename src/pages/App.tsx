@@ -6,14 +6,14 @@ import useInput from "../hooks/useInput";
 import { webrtcService } from "../services/webrtc";
 import Desktop from "../domain/babylon/desktop";
 import Event from "rx.mini";
-import VR from "../domain/babylon/vr";
+import VR, { OnMountProps } from "../domain/babylon/vr";
+import Keyboard from "../domain/babylon/keyboard";
 
 const App: React.FC = () => {
   const [room, setroom, clearroom] = useInput();
   const ref = useRef<any>();
   const [stream, setstream] = useState<MediaStream>();
   const [mouseMoveEvent] = useState(new Event<{ x: number; y: number }>());
-  const [mouseClickEvent] = useState(new Event());
 
   const onSceneMount = (e: SceneEventArgs) => {
     const { canvas, scene } = e;
@@ -26,10 +26,6 @@ const App: React.FC = () => {
 
     mouseMoveEvent.subscribe(pos =>
       webrtcService.peer.send(JSON.stringify({ type: "move", payload: pos }))
-    );
-
-    mouseClickEvent.subscribe(() =>
-      webrtcService.peer.send(JSON.stringify({ type: "click" }))
     );
   };
 
@@ -47,14 +43,22 @@ const App: React.FC = () => {
     });
   };
 
+  const onVRMount = (props: OnMountProps) => {
+    const { cotrollerActionEvent } = props;
+    cotrollerActionEvent.subscribe(() =>
+      webrtcService.peer.send(JSON.stringify({ type: "click" }))
+    );
+  };
+
   return (
     <div>
       <div style={{ display: "flex" }}>
         <input onChange={setroom} value={room} />
         <button onClick={connect}>connect</button>
       </div>
+      <video ref={ref} autoPlay={true} width={0} height={0} />
       <SceneCreate onSceneMount={onSceneMount} height={400} width={600}>
-        <VR event={mouseClickEvent} />
+        <VR onMount={onVRMount} />
         {stream && (
           <Desktop
             stream={stream}
@@ -65,8 +69,8 @@ const App: React.FC = () => {
             mouseMoveEvent={mouseMoveEvent}
           />
         )}
+        <Keyboard />
       </SceneCreate>
-      <video ref={ref} autoPlay={true} width={340} height={200} />
     </div>
   );
 };

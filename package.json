@@ -6,6 +6,7 @@
   "homepage": ".",
   "dependencies": {
     "@babylonjs/core": "^4.0.3",
+    "@babylonjs/gui": "^4.0.3",
     "@types/jest": "24.0.13",
     "@types/node": "12.0.2",
     "@types/react": "16.8.18",
