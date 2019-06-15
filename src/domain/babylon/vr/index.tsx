@@ -1,4 +1,12 @@
-import React, { FC, Fragment, useContext, useEffect } from "react";
+import React, {
+  FC,
+  Fragment,
+  useContext,
+  useEffect,
+  Children,
+  cloneElement,
+  useState
+} from "react";
 import { Context } from "../scene";
 import { Color3 } from "@babylonjs/core";
 import Event from "rx.mini";
@@ -11,14 +19,15 @@ export type OnMountProps = {
 
 const VR: FC<{
   onMount?: (props: OnMountProps) => void;
-}> = ({ onMount }) => {
+}> = ({ onMount, children }) => {
   const context = useContext(Context);
+  const [childrenMod, setchildrenMod] = useState<any>();
 
   useEffect(() => {
-    const cotrollerActionEvent = new Event<ControllerAction>();
-    const vrPositionEvent = new Event<VrPosition>();
-
     if (context) {
+      const cotrollerActionEvent = new Event<ControllerAction>();
+      const vrPositionEvent = new Event<VrPosition>();
+
       const { scene } = context;
 
       const environment = scene.createDefaultEnvironment({
@@ -49,11 +58,18 @@ const VR: FC<{
         vrPositionEvent.execute({ pos });
       });
 
-      if (onMount) onMount({ cotrollerActionEvent, vrPositionEvent });
+      const props = { cotrollerActionEvent, vrPositionEvent };
+      if (onMount) onMount(props);
+
+      setchildrenMod(
+        Children.map(children, child => {
+          return cloneElement(child as any, { props });
+        })
+      );
     }
   }, [context]);
 
-  return <Fragment />;
+  return <Fragment>{childrenMod && childrenMod}</Fragment>;
 };
 
 export default VR;

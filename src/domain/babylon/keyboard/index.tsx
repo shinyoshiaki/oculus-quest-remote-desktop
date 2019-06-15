@@ -7,8 +7,10 @@ import {
   Control
 } from "@babylonjs/gui";
 import { MeshBuilder, Vector3 } from "@babylonjs/core";
+import { OnMountProps } from "../vr";
 
-const Keyboard: FC = () => {
+const Keyboard: FC<{ props?: OnMountProps }> = ({ props }) => {
+  const { vrPositionEvent, cotrollerActionEvent } = props!;
   const context = useContext(Context);
 
   useEffect(() => {
@@ -20,7 +22,16 @@ const Keyboard: FC = () => {
         { width: 1, height: 1 },
         scene as any
       );
+
       plane.position = new Vector3(0, 1, 0);
+
+      cotrollerActionEvent.subscribe(async ({ hand }) => {
+        if (hand === "left") {
+          const { pos } = await vrPositionEvent.asPromise();
+          plane.position = pos;
+          plane.translate(new Vector3(0, 0.2, 0.5), 1);
+        }
+      });
 
       var advancedTexture = AdvancedDynamicTexture.CreateForMesh(
         plane,
