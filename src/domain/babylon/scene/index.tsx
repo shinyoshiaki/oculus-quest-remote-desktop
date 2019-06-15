@@ -1,7 +1,9 @@
 import { Engine, Scene, EngineOptions } from "@babylonjs/core";
 import React, { FC, useEffect, useRef, createContext, useState } from "react";
 
-export const Context = createContext<SceneEventArgs | undefined>(undefined);
+export const SceneContext = createContext<SceneEventArgs | undefined>(
+  undefined
+);
 
 export type SceneEventArgs = {
   engine: Engine;
@@ -57,10 +59,10 @@ const SceneCreate: FC<Props> = ({
 
   return (
     <div>
-      <Context.Provider value={context as any}>
+      <SceneContext.Provider value={context}>
         <canvas width={width} height={height} ref={canvasRef} />
         {context && children}
-      </Context.Provider>
+      </SceneContext.Provider>
     </div>
   );
 };

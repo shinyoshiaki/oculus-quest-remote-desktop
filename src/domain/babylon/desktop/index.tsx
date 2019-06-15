@@ -1,4 +1,4 @@
-import { Context } from "../scene";
+import { SceneContext } from "../scene";
 import Event from "rx.mini";
 import React, { FC, Fragment, useContext, useEffect } from "react";
 import {
@@ -18,8 +18,8 @@ const Desktop: FC<{
   stream: MediaStream;
   onMount?: (props: OnDesktopMountProps) => void;
   ratio?: { vertical: number; horizontal: number };
-}> = ({ stream, ratio }) => {
-  const context = useContext(Context);
+}> = ({ stream, ratio, onMount }) => {
+  const context = useContext(SceneContext);
 
   useEffect(() => {
     (async () => {
@@ -78,6 +78,8 @@ const Desktop: FC<{
             }
           };
         }
+
+        if (onMount) onMount({ mouseMoveEvent });
       }
     })();
   }, [context]);

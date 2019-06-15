@@ -1,5 +1,5 @@
 import React, { FC, useContext, Fragment, useEffect } from "react";
-import { Context } from "../scene";
+import { SceneContext } from "../scene";
 import {
   AdvancedDynamicTexture,
   InputText,
@@ -7,7 +7,7 @@ import {
   Control
 } from "@babylonjs/gui";
 import { MeshBuilder, Vector3 } from "@babylonjs/core";
-import { OnMountProps } from "../vr";
+import { VRContext } from "../vr";
 import Event from "rx.mini";
 import { keyboardAction, KeyboardAction } from "./model";
 
@@ -16,17 +16,17 @@ export type OnKeyboardMountProps = {
 };
 
 const Keyboard: FC<{
-  props?: OnMountProps;
   onMount?: (props: OnKeyboardMountProps) => void;
-}> = ({ props }) => {
-  const { vrPositionEvent, cotrollerActionEvent } = props!;
-  const context = useContext(Context);
+}> = () => {
+  const context = useContext(SceneContext);
+  const vrContext = useContext(VRContext);
 
   useEffect(() => {
-    if (context) {
+    if (context && vrContext) {
       const keyboardActionEvent = new Event<KeyboardAction>();
 
       const { scene } = context;
+      const { cotrollerActionEvent, vrPositionEvent } = vrContext;
 
       const plane = MeshBuilder.CreatePlane(
         "ui",

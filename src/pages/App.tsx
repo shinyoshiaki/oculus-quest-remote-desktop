@@ -48,8 +48,8 @@ const App: FC = () => {
 
   const onVRMount = (props: OnMountProps) => {
     const { cotrollerActionEvent } = props;
-    cotrollerActionEvent.subscribe(() => {
-      if (webrtcService.peer)
+    cotrollerActionEvent.subscribe(({ hand }) => {
+      if (webrtcService.peer && hand === "right")
         webrtcService.peer.send(JSON.stringify({ type: "click" }));
     });
   };
@@ -68,7 +68,7 @@ const App: FC = () => {
         <input onChange={setroom} value={room} />
         <button onClick={connect}>connect</button>
       </div>
-      <video ref={ref} autoPlay={true} width={0} height={0} />
+
       <SceneCreate onSceneMount={onSceneMount} height={400} width={600}>
         <VR onMount={onVRMount}>
           <Keyboard onMount={onKeyboardMount} />
@@ -84,6 +84,7 @@ const App: FC = () => {
           />
         )}
       </SceneCreate>
+      <video ref={ref} autoPlay={true} width={100} height={100} />
     </div>
   );
 };
