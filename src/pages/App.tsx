@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, FC } from "react";
 
 import SceneCreate, { SceneEventArgs } from "../domain/babylon/scene";
 import { Vector3, HemisphericLight, FreeCamera } from "@babylonjs/core";
@@ -6,9 +6,9 @@ import useInput from "../hooks/useInput";
 import { webrtcService } from "../services/webrtc";
 import Desktop, { OnDesktopMountProps } from "../domain/babylon/desktop";
 import VR, { OnMountProps } from "../domain/babylon/vr";
-import Keyboard from "../domain/babylon/keyboard";
+import Keyboard, { OnKeyboardMountProps } from "../domain/babylon/keyboard";
 
-const App: React.FC = () => {
+const App: FC = () => {
   const [room, setroom, clearroom] = useInput();
   const ref = useRef<any>();
   const [stream, setstream] = useState<MediaStream>();
@@ -54,6 +54,14 @@ const App: React.FC = () => {
     });
   };
 
+  const onKeyboardMount = (props: OnKeyboardMountProps) => {
+    const { keyboardActionEvent } = props;
+    keyboardActionEvent.subscribe(({ key }) => {
+      if (webrtcService.peer)
+        webrtcService.peer.send(JSON.stringify({ type: "key", payload: key }));
+    });
+  };
+
   return (
     <div>
       <div style={{ display: "flex" }}>
@@ -63,7 +71,7 @@ const App: React.FC = () => {
       <video ref={ref} autoPlay={true} width={0} height={0} />
       <SceneCreate onSceneMount={onSceneMount} height={400} width={600}>
         <VR onMount={onVRMount}>
-          <Keyboard />
+          <Keyboard onMount={onKeyboardMount} />
         </VR>
         {stream && (
           <Desktop

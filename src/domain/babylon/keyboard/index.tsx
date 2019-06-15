@@ -8,13 +8,24 @@ import {
 } from "@babylonjs/gui";
 import { MeshBuilder, Vector3 } from "@babylonjs/core";
 import { OnMountProps } from "../vr";
+import Event from "rx.mini";
+import { keyboardAction, KeyboardAction } from "./model";
 
-const Keyboard: FC<{ props?: OnMountProps }> = ({ props }) => {
+export type OnKeyboardMountProps = {
+  keyboardActionEvent: Event<KeyboardAction>;
+};
+
+const Keyboard: FC<{
+  props?: OnMountProps;
+  onMount?: (props: OnKeyboardMountProps) => void;
+}> = ({ props }) => {
   const { vrPositionEvent, cotrollerActionEvent } = props!;
   const context = useContext(Context);
 
   useEffect(() => {
     if (context) {
+      const keyboardActionEvent = new Event<KeyboardAction>();
+
       const { scene } = context;
 
       const plane = MeshBuilder.CreatePlane(
@@ -34,13 +45,13 @@ const Keyboard: FC<{ props?: OnMountProps }> = ({ props }) => {
         }
       });
 
-      var advancedTexture = AdvancedDynamicTexture.CreateForMesh(
+      const advancedTexture = AdvancedDynamicTexture.CreateForMesh(
         plane,
         1024,
         1024
       );
 
-      var input = new InputText();
+      const input = new InputText();
       input.width = 0.2;
       input.maxWidth = 0.2;
       input.height = "40px";
@@ -48,11 +59,15 @@ const Keyboard: FC<{ props?: OnMountProps }> = ({ props }) => {
       input.background = "green";
       advancedTexture.addControl(input);
 
-      var keyboard = VirtualKeyboard.CreateDefaultLayout();
+      const keyboard = VirtualKeyboard.CreateDefaultLayout();
       keyboard.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
       advancedTexture.addControl(keyboard);
 
       keyboard.connect(input);
+
+      input.onTextChangedObservable.add(e => {
+        keyboardActionEvent.execute(keyboardAction(e.currentKey));
+      });
     }
   }, [context]);
 
