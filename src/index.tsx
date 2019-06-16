@@ -10,11 +10,7 @@ const store = createStore();
 
 ReactDOM.render(
   <Provider store={store}>
-    <HashRouter>
-      <div>
-        <Route exact path="/" component={App} />
-      </div>
-    </HashRouter>
+    <App />
   </Provider>,
   document.getElementById("root")
 );

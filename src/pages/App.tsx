@@ -1,13 +1,20 @@
-import React, { useRef, useState, FC, useEffect } from "react";
+import React, { useRef, useState, FC } from "react";
 
 import SceneCreate, { SceneEventArgs } from "../domain/babylon/scene";
-import { Vector3, HemisphericLight, FreeCamera } from "@babylonjs/core";
+import {
+  Vector3,
+  HemisphericLight,
+  FreeCamera,
+  MeshBuilder,
+  StandardMaterial,
+  CubeTexture,
+  Texture
+} from "@babylonjs/core";
 import useInput from "../hooks/useInput";
 import { webrtcService } from "../services/webrtc";
 import Desktop, { OnDesktopMountProps } from "../domain/babylon/desktop";
 import VR, { OnMountProps } from "../domain/babylon/vr";
 import Keyboard, { OnKeyboardMountProps } from "../domain/babylon/keyboard";
-import { useSelector } from "react-redux";
 import { ReduxState } from "../redux";
 import useSelectorRef from "../hooks/useSelectorRef";
 
