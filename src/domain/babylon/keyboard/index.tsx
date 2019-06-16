@@ -10,7 +10,7 @@ import { MeshBuilder, Vector3 } from "@babylonjs/core";
 import { VRContext } from "../vr";
 import Event from "rx.mini";
 import { keyboardAction, KeyboardAction } from "./model";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { keyboardSwitch } from "../../../redux/devices";
 
 export type OnKeyboardMountProps = {
@@ -74,8 +74,6 @@ const Keyboard: FC<{
       input.onBlurObservable.add(() => {
         keyboardActionEvent.execute(keyboardAction("enter"));
         input.text = "";
-        plane.isVisible = false;
-        dispatch(keyboardSwitch(plane.isVisible));
       });
 
       cotrollerActionEvent.subscribe(async ({ hand }) => {
