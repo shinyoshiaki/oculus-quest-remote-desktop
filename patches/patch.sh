@@ -1,1 +1,1 @@
-mv ./babylon/inputText.js ../node_modules/@babylonjs/gui/2D/controls/inputText.js
+cp ./babylon/inputText.js ../node_modules/@babylonjs/gui/2D/controls/inputText.js -f
