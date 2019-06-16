@@ -23,12 +23,11 @@
     "webrtc4me": "git+https://git@github.com/shinyoshiaki/webrtc4me.git"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "npm run patch && react-scripts start",
+    "build": "npm run patch && react-scripts build",
     "type": "tsc --noEmit",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "prod": "npm run build && cd electron && npm run packager"
+    "prod": "npm run build && cd electron && npm run packager",
+    "patch": "cd patches && ./patch.sh"
   },
   "browserslist": {
     "production": [
