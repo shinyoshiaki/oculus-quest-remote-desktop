@@ -6,7 +6,13 @@ import React, {
   createContext
 } from "react";
 import { SceneContext } from "../scene";
-import { Color3 } from "@babylonjs/core";
+import {
+  Color3,
+  MeshBuilder,
+  StandardMaterial,
+  CubeTexture,
+  Texture
+} from "@babylonjs/core";
 import Event from "rx.mini";
 import { ControllerAction, VrPosition } from "./model";
 
@@ -31,10 +37,22 @@ const VR: FC<{
 
       const { scene } = context;
 
+      const files = [
+        `${process.env.PUBLIC_URL}/textures/Space/space_left.jpg`,
+        `${process.env.PUBLIC_URL}/textures/Space/space_up.jpg`,
+        `${process.env.PUBLIC_URL}/textures/Space/space_front.jpg`,
+        `${process.env.PUBLIC_URL}/textures/Space/space_right.jpg`,
+        `${process.env.PUBLIC_URL}/textures/Space/space_down.jpg`,
+        `${process.env.PUBLIC_URL}/textures/Space/space_back.jpg`
+      ];
+      const texture = CubeTexture.CreateFromImages(files, scene);
+
       const environment = scene.createDefaultEnvironment({
-        groundYBias: 1
+        groundYBias: 1,
+        createSkybox: true,
+        skyboxSize: 150,
+        skyboxTexture: texture
       })!;
-      environment!.setMainColor(Color3.FromHexString("#74b9ff"));
 
       const vrHelper = scene.createDefaultVRExperience({
         createDeviceOrientationCamera: false
