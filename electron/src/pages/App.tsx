@@ -1,7 +1,7 @@
 import React, { FC, useState } from "react";
 import Display from "../components/display";
 import { create } from "../domain/webrtc/signaling";
-import { moveMouse, clickMouse } from "../server/robot";
+import { moveMouse, clickMouse, keyTap } from "../server/robot";
 
 function getRandomInt(min: number, max: number) {
   min = Math.ceil(min);
@@ -27,6 +27,9 @@ const Cast: FC = () => {
           break;
         case "click":
           clickMouse.execute();
+          break;
+        case "key":
+          keyTap.execute(data.payload);
           break;
       }
     });

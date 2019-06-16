@@ -6,8 +6,9 @@ const robot: typeof robotjs = load("robotjs");
 
 const moveMouse = new Event<{ x: number; y: number }>();
 const clickMouse = new Event();
+const keyTap = new Event<string>();
 
-export { moveMouse, clickMouse };
+export { moveMouse, clickMouse, keyTap };
 
 export default function remote() {
   const screenSize = robot.getScreenSize();
@@ -21,5 +22,9 @@ export default function remote() {
   clickMouse.subscribe(() => {
     console.log("left");
     robot.mouseClick("left");
+  });
+
+  keyTap.subscribe(s => {
+    robot.keyTap(s);
   });
 }

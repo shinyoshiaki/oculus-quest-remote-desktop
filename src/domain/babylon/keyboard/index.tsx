@@ -36,17 +36,7 @@ const Keyboard: FC<{
         { width: 1, height: 1 },
         scene as any
       );
-
-      plane.position = new Vector3(0, 1, 0);
-
-      cotrollerActionEvent.subscribe(async ({ hand }) => {
-        if (hand === "left") {
-          const { pos, qua } = await vrPositionEvent.asPromise();
-          plane.position = pos;
-          plane.rotationQuaternion = qua;
-          plane.translate(new Vector3(0, 0, 0.6), 1);
-        }
-      });
+      plane.isVisible = false;
 
       const advancedTexture = AdvancedDynamicTexture.CreateForMesh(
         plane,
@@ -68,13 +58,36 @@ const Keyboard: FC<{
 
       keyboard.connect(input);
 
+      let textBuffer = input.text;
       input.onTextChangedObservable.add(e => {
-        keyboardActionEvent.execute(keyboardAction(e.currentKey));
+        console.log({ e }, input.text);
+
+        if (input.text === textBuffer.slice(0, -1)) {
+          console.log("back");
+          keyboardActionEvent.execute(keyboardAction("backspace"));
+        } else {
+          keyboardActionEvent.execute(keyboardAction(e.currentKey));
+        }
+        textBuffer = input.text;
       });
 
-      input.onFocusObservable.add(() => dispatch(keyboardSwitch(true)));
+      input.onBlurObservable.add(() => {
+        keyboardActionEvent.execute(keyboardAction("enter"));
+        input.text = "";
+        plane.isVisible = false;
+        dispatch(keyboardSwitch(plane.isVisible));
+      });
 
-      input.onBlurObservable.add(() => dispatch(keyboardSwitch(false)));
+      cotrollerActionEvent.subscribe(async ({ hand }) => {
+        if (hand === "left") {
+          plane.isVisible = !plane.isVisible;
+          dispatch(keyboardSwitch(plane.isVisible));
+          const { pos, qua } = await vrPositionEvent.asPromise();
+          plane.position = pos;
+          plane.rotationQuaternion = qua;
+          plane.translate(new Vector3(0, 0, 0.6), 1);
+        }
+      });
 
       if (onMount) onMount({ keyboardActionEvent });
     }

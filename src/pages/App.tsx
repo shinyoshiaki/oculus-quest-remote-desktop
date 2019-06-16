@@ -9,6 +9,7 @@ import VR, { OnMountProps } from "../domain/babylon/vr";
 import Keyboard, { OnKeyboardMountProps } from "../domain/babylon/keyboard";
 import { useSelector } from "react-redux";
 import { ReduxState } from "../redux";
+import useSelectorRef from "../hooks/useSelectorRef";
 
 const App: FC = () => {
   const [room, setroom, clearroom] = useInput();
@@ -25,10 +26,15 @@ const App: FC = () => {
     (scene.activeCamera as any).beta += 0.8;
   };
 
+  const keyboardOpenRef = useSelectorRef(
+    (store: ReduxState) => store.devices.keyboardOpen
+  );
+
   const onDesktopMount = (props: OnDesktopMountProps) => {
     const { mouseMoveEvent } = props;
     mouseMoveEvent.subscribe(pos => {
-      if (webrtcService.peer)
+      console.log("ref", keyboardOpenRef.current);
+      if (webrtcService.peer && !keyboardOpenRef.current)
         webrtcService.peer.send(JSON.stringify({ type: "move", payload: pos }));
     });
   };
@@ -51,7 +57,7 @@ const App: FC = () => {
   const onVRMount = (props: OnMountProps) => {
     const { cotrollerActionEvent } = props;
     cotrollerActionEvent.subscribe(({ hand }) => {
-      if (webrtcService.peer && hand === "right")
+      if (webrtcService.peer && hand === "right" && !keyboardOpenRef.current)
         webrtcService.peer.send(JSON.stringify({ type: "click" }));
     });
   };
@@ -63,17 +69,6 @@ const App: FC = () => {
         webrtcService.peer.send(JSON.stringify({ type: "key", payload: key }));
     });
   };
-
-  const keyboardOpen = useSelector(
-    (store: ReduxState) => store.devices.keyboardOpen
-  );
-
-  useEffect(() => {
-    if (webrtcService.peer)
-      webrtcService.peer.send(
-        JSON.stringify({ type: "state", payload: keyboardOpen })
-      );
-  }, [keyboardOpen]);
 
   return (
     <div>
