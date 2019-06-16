@@ -9,7 +9,7 @@ const clickMouse = new Event();
 
 export { moveMouse, clickMouse };
 
-export default function mouse() {
+export default function remote() {
   const screenSize = robot.getScreenSize();
   const height = screenSize.height;
   const width = screenSize.width;

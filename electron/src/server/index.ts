@@ -1,7 +1,5 @@
-import mouse from "./robot";
-import signaling from "./signaling";
+import remote from "./robot";
 
 export default async function server() {
-  mouse();
-  signaling();
+  remote();
 }
