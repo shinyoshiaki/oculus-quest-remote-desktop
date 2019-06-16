@@ -1,4 +1,4 @@
-import { Context } from "../scene";
+import { SceneContext } from "../scene";
 import Event from "rx.mini";
 import React, { FC, Fragment, useContext, useEffect } from "react";
 import {
@@ -10,16 +10,22 @@ import {
   Texture
 } from "@babylonjs/core";
 
+export type OnDesktopMountProps = {
+  mouseMoveEvent: Event<{ x: number; y: number }>;
+};
+
 const Desktop: FC<{
   stream: MediaStream;
-  mouseMoveEvent: Event<{ x: number; y: number }>;
+  onMount?: (props: OnDesktopMountProps) => void;
   ratio?: { vertical: number; horizontal: number };
-}> = ({ stream, ratio, mouseMoveEvent }) => {
-  const context = useContext(Context);
+}> = ({ stream, ratio, onMount }) => {
+  const context = useContext(SceneContext);
 
   useEffect(() => {
     (async () => {
       if (context) {
+        const mouseMoveEvent = new Event<{ x: number; y: number }>();
+
         const { scene } = context;
         const vertical = ratio ? ratio.vertical : 2;
         const horizontal = ratio ? ratio.horizontal : 1.7 * 2;
@@ -72,6 +78,8 @@ const Desktop: FC<{
             }
           };
         }
+
+        if (onMount) onMount({ mouseMoveEvent });
       }
     })();
   }, [context]);

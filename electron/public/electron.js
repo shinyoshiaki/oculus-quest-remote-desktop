@@ -17,7 +17,7 @@ function createWindow() {
 
   const staticIndexPath = path.join(__dirname, "./index.html");
   const main = IS_DEV
-    ? `http://localhost:3000`
+    ? `http://localhost:4000`
     : url.format({
         pathname: staticIndexPath,
         protocol: "file:",

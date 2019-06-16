@@ -1,25 +1,25 @@
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useRef } from "react";
 import { getScreen } from "../../domain/media";
 
 type Props = { onStream: (stream: MediaStream) => void };
 
-let desktopRef: any = React.createRef();
-
 const Display: FC<Props> = ({ onStream }) => {
-  useEffect(() => {
-    init();
-  }, []);
+  const ref = useRef<any>();
 
-  const init = async () => {
-    const stream = await getScreen();
-    desktopRef.srcObject = stream;
-    onStream(stream);
-  };
+  useEffect(() => {
+    (async () => {
+      console.log("display");
+      const stream = await getScreen();
+      console.log(stream);
+      ref.current.srcObject = stream;
+      onStream(stream);
+    })();
+  }, []);
 
   return (
     <div>
       <p>display</p>
-      <video ref={v => (desktopRef = v)} autoPlay={true} muted={true} />
+      <video ref={ref} autoPlay={true} muted={true} />
     </div>
   );
 };

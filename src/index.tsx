@@ -1,15 +1,21 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { HashRouter, Route } from "react-router-dom";
+import { Provider } from "react-redux";
 import App from "./pages/App";
 import * as serviceWorker from "./serviceWorker";
+import createStore from "./redux";
+
+const store = createStore();
 
 ReactDOM.render(
-  <HashRouter>
-    <div>
-      <Route exact path="/" component={App} />
-    </div>
-  </HashRouter>,
+  <Provider store={store}>
+    <HashRouter>
+      <div>
+        <Route exact path="/" component={App} />
+      </div>
+    </HashRouter>
+  </Provider>,
   document.getElementById("root")
 );
 

@@ -1,6 +1,7 @@
 export function getScreen() {
   return new Promise<MediaStream>(resolve => {
-    (navigator.mediaDevices as any)
+    const nav = navigator.mediaDevices as any;
+    nav
       .getUserMedia({
         audio: {
           mandatory: {
@@ -15,6 +16,19 @@ export function getScreen() {
       })
       .then((stream: any) => {
         resolve(stream);
+      })
+      .catch(() => {
+        nav
+          .getUserMedia({
+            video: {
+              mandatory: {
+                chromeMediaSource: "desktop"
+              }
+            }
+          })
+          .then((stream: any) => {
+            resolve(stream);
+          });
       });
   });
 }

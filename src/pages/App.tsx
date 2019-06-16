@@ -1,39 +1,41 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, FC, useEffect } from "react";
 
 import SceneCreate, { SceneEventArgs } from "../domain/babylon/scene";
 import { Vector3, HemisphericLight, FreeCamera } from "@babylonjs/core";
 import useInput from "../hooks/useInput";
 import { webrtcService } from "../services/webrtc";
-import Desktop from "../domain/babylon/desktop";
-import Event from "rx.mini";
-import VR from "../domain/babylon/vr";
+import Desktop, { OnDesktopMountProps } from "../domain/babylon/desktop";
+import VR, { OnMountProps } from "../domain/babylon/vr";
+import Keyboard, { OnKeyboardMountProps } from "../domain/babylon/keyboard";
+import { useSelector } from "react-redux";
+import { ReduxState } from "../redux";
+import useSelectorRef from "../hooks/useSelectorRef";
 
-const App: React.FC = () => {
+const App: FC = () => {
   const [room, setroom, clearroom] = useInput();
   const ref = useRef<any>();
   const [stream, setstream] = useState<MediaStream>();
-  const [mouseMoveEvent] = useState(new Event<{ x: number; y: number }>());
-  const [mouseClickEvent] = useState(new Event());
 
   const onSceneMount = (e: SceneEventArgs) => {
-    const { canvas, scene, engine } = e;
+    const { canvas, scene } = e;
 
     new HemisphericLight("sunLight", new Vector3(0, 1, 0), scene);
 
     const camera = new FreeCamera("camera", new Vector3(0, 1, -2), scene);
     camera.attachControl(canvas, true);
     (scene.activeCamera as any).beta += 0.8;
+  };
 
-    mouseMoveEvent.subscribe(pos =>
-      webrtcService.peer.send(JSON.stringify({ type: "move", payload: pos }))
-    );
+  const keyboardOpenRef = useSelectorRef(
+    (store: ReduxState) => store.devices.keyboardOpen
+  );
 
-    mouseClickEvent.subscribe(() =>
-      webrtcService.peer.send(JSON.stringify({ type: "click" }))
-    );
-
-    engine.runRenderLoop(() => {
-      scene.render();
+  const onDesktopMount = (props: OnDesktopMountProps) => {
+    const { mouseMoveEvent } = props;
+    mouseMoveEvent.subscribe(pos => {
+      console.log("ref", keyboardOpenRef.current);
+      if (webrtcService.peer && !keyboardOpenRef.current)
+        webrtcService.peer.send(JSON.stringify({ type: "move", payload: pos }));
     });
   };
 
@@ -44,10 +46,27 @@ const App: React.FC = () => {
       false
     );
     clearroom();
-    webrtcService.peer.onAddTrack.subscribe(ms => {
-      setstream(ms);
-      console.log(ms);
-      ref.current.srcObject = ms;
+    if (webrtcService.peer)
+      webrtcService.peer.onAddTrack.subscribe(ms => {
+        setstream(ms);
+        console.log(ms);
+        ref.current.srcObject = ms;
+      });
+  };
+
+  const onVRMount = (props: OnMountProps) => {
+    const { cotrollerActionEvent } = props;
+    cotrollerActionEvent.subscribe(({ hand }) => {
+      if (webrtcService.peer && hand === "right" && !keyboardOpenRef.current)
+        webrtcService.peer.send(JSON.stringify({ type: "click" }));
+    });
+  };
+
+  const onKeyboardMount = (props: OnKeyboardMountProps) => {
+    const { keyboardActionEvent } = props;
+    keyboardActionEvent.subscribe(({ key }) => {
+      if (webrtcService.peer)
+        webrtcService.peer.send(JSON.stringify({ type: "key", payload: key }));
     });
   };
 
@@ -57,8 +76,11 @@ const App: React.FC = () => {
         <input onChange={setroom} value={room} />
         <button onClick={connect}>connect</button>
       </div>
+
       <SceneCreate onSceneMount={onSceneMount} height={400} width={600}>
-        <VR event={mouseClickEvent} />
+        <VR onMount={onVRMount}>
+          <Keyboard onMount={onKeyboardMount} />
+        </VR>
         {stream && (
           <Desktop
             stream={stream}
@@ -66,11 +88,11 @@ const App: React.FC = () => {
               vertical: 2,
               horizontal: 2 * 1.7
             }}
-            mouseMoveEvent={mouseMoveEvent}
+            onMount={onDesktopMount}
           />
         )}
       </SceneCreate>
-      <video ref={ref} autoPlay={true} width={340} height={200} />
+      <video ref={ref} autoPlay={true} width={100} height={100} />
     </div>
   );
 };

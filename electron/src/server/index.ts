@@ -1,8 +1,5 @@
-import mouse from "./robot";
-import signaling from "./signaling";
+import remote from "./robot";
 
 export default async function server() {
-  mouse();
-  console.log((window as any).require("crypto"));
-  signaling();
+  remote();
 }

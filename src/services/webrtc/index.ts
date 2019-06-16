@@ -5,7 +5,7 @@ class WebRTCService {
   private rtc?: WebRTC;
 
   get peer() {
-    return this.rtc!;
+    return this.rtc;
   }
 
   create(url: string, roomId: string, trickle: boolean) {
