@@ -10,6 +10,8 @@ import { MeshBuilder, Vector3 } from "@babylonjs/core";
 import { VRContext } from "../vr";
 import Event from "rx.mini";
 import { keyboardAction, KeyboardAction } from "./model";
+import { useDispatch, useSelector } from "react-redux";
+import { keyboardSwitch } from "../../../redux/devices";
 
 export type OnKeyboardMountProps = {
   keyboardActionEvent: Event<KeyboardAction>;
@@ -17,9 +19,10 @@ export type OnKeyboardMountProps = {
 
 const Keyboard: FC<{
   onMount?: (props: OnKeyboardMountProps) => void;
-}> = () => {
+}> = ({ onMount }) => {
   const context = useContext(SceneContext);
   const vrContext = useContext(VRContext);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (context && vrContext) {
@@ -68,6 +71,12 @@ const Keyboard: FC<{
       input.onTextChangedObservable.add(e => {
         keyboardActionEvent.execute(keyboardAction(e.currentKey));
       });
+
+      input.onFocusObservable.add(() => dispatch(keyboardSwitch(true)));
+
+      input.onBlurObservable.add(() => dispatch(keyboardSwitch(false)));
+
+      if (onMount) onMount({ keyboardActionEvent });
     }
   }, [context]);
 

@@ -1,4 +1,4 @@
-import React, { useRef, useState, FC } from "react";
+import React, { useRef, useState, FC, useEffect } from "react";
 
 import SceneCreate, { SceneEventArgs } from "../domain/babylon/scene";
 import { Vector3, HemisphericLight, FreeCamera } from "@babylonjs/core";
@@ -7,6 +7,8 @@ import { webrtcService } from "../services/webrtc";
 import Desktop, { OnDesktopMountProps } from "../domain/babylon/desktop";
 import VR, { OnMountProps } from "../domain/babylon/vr";
 import Keyboard, { OnKeyboardMountProps } from "../domain/babylon/keyboard";
+import { useSelector } from "react-redux";
+import { ReduxState } from "../redux";
 
 const App: FC = () => {
   const [room, setroom, clearroom] = useInput();
@@ -61,6 +63,17 @@ const App: FC = () => {
         webrtcService.peer.send(JSON.stringify({ type: "key", payload: key }));
     });
   };
+
+  const keyboardOpen = useSelector(
+    (store: ReduxState) => store.devices.keyboardOpen
+  );
+
+  useEffect(() => {
+    if (webrtcService.peer)
+      webrtcService.peer.send(
+        JSON.stringify({ type: "state", payload: keyboardOpen })
+      );
+  }, [keyboardOpen]);
 
   return (
     <div>
