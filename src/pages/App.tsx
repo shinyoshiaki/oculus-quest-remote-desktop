@@ -1,15 +1,17 @@
 import React, { useRef, useState, FC, useEffect } from "react";
 
-import SceneCreate, { SceneEventArgs } from "../domain/babylon/scene";
+import SceneCreate, { SceneEventArgs } from "../components/babylon/scene";
 import { Vector3, HemisphericLight, FreeCamera } from "@babylonjs/core";
 import useInput from "../hooks/useInput";
 import { webrtcService } from "../services/webrtc";
-import Desktop, { OnDesktopMountProps } from "../domain/babylon/desktop";
-import VR, { OnMountProps } from "../domain/babylon/vr";
-import Keyboard, { OnKeyboardMountProps } from "../domain/babylon/keyboard";
+import Desktop, { OnDesktopMountProps } from "../components/babylon/desktop";
+import VR, { OnMountProps } from "../components/babylon/vr";
+import Keyboard, { OnKeyboardMountProps } from "../components/babylon/keyboard";
 import { useSelector } from "react-redux";
 import { ReduxState } from "../redux";
 import useSelectorRef from "../hooks/useSelectorRef";
+import VRContainer from "../containers/vr";
+import KeyboardContainer from "../containers/keyboard";
 
 const App: FC = () => {
   const [room, setroom, clearroom] = useInput();
@@ -54,21 +56,7 @@ const App: FC = () => {
       });
   };
 
-  const onVRMount = (props: OnMountProps) => {
-    const { cotrollerActionEvent } = props;
-    cotrollerActionEvent.subscribe(({ hand }) => {
-      if (webrtcService.peer && hand === "right" && !keyboardOpenRef.current)
-        webrtcService.peer.send(JSON.stringify({ type: "click" }));
-    });
-  };
 
-  const onKeyboardMount = (props: OnKeyboardMountProps) => {
-    const { keyboardActionEvent } = props;
-    keyboardActionEvent.subscribe(({ key }) => {
-      if (webrtcService.peer)
-        webrtcService.peer.send(JSON.stringify({ type: "key", payload: key }));
-    });
-  };
 
   return (
     <div>
@@ -78,9 +66,9 @@ const App: FC = () => {
       </div>
 
       <SceneCreate onSceneMount={onSceneMount} height={400} width={600}>
-        <VR onMount={onVRMount}>
-          <Keyboard onMount={onKeyboardMount} />
-        </VR>
+        <VRContainer>
+          <KeyboardContainer/>
+        </VRContainer>
         {stream && (
           <Desktop
             stream={stream}
