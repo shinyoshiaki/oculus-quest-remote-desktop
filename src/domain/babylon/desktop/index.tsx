@@ -30,8 +30,6 @@ const Desktop: FC<{
         const vertical = ratio ? ratio.vertical : 2;
         const horizontal = ratio ? ratio.horizontal : 1.7 * 2;
 
-        console.log({ stream });
-
         const desktop = MeshBuilder.CreatePlane(
           "desktop",
           { width: horizontal, height: vertical },
