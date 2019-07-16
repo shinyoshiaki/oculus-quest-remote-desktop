@@ -5,8 +5,8 @@
   "private": true,
   "homepage": ".",
   "dependencies": {
-    "@babylonjs/core": "^4.0.3",
-    "@babylonjs/gui": "^4.0.3",
+    "@babylonjs/core": "4.1.0-alpha.8",
+    "@babylonjs/gui": "4.1.0-alpha.8",
     "@types/jest": "24.0.13",
     "@types/node": "12.0.2",
     "@types/react": "16.8.18",
@@ -20,11 +20,11 @@
     "redux-logger": "^3.0.6",
     "socket.io-client": "^2.2.0",
     "typescript": "3.4.5",
-    "webrtc4me": "git+https://git@github.com/shinyoshiaki/webrtc4me.git"
+    "webrtc4me": "^0.6.1"
   },
   "scripts": {
-    "start": "npm run patch && react-scripts start",
-    "build": "npm run patch && react-scripts build",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
     "type": "tsc --noEmit",
     "prod": "npm run build && cd electron && npm run packager",
     "patch": "cd patches && ./patch.sh"
