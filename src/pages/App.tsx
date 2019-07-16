@@ -47,6 +47,7 @@ const App: FC = () => {
     clearroom();
     if (webrtcService.peer)
       webrtcService.peer.onAddTrack.subscribe(ms => {
+        console.log({ ms });
         setstream(ms);
       });
   };
