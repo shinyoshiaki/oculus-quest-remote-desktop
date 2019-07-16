@@ -1,17 +1,17 @@
 import React, { FC, useContext, Fragment, useEffect } from "react";
 import { SceneContext } from "../scene";
-import {
-  AdvancedDynamicTexture,
-  InputText,
-  VirtualKeyboard,
-  Control
-} from "@babylonjs/gui";
 import { MeshBuilder, Vector3 } from "@babylonjs/core";
 import { VRContext } from "../vr";
 import Event from "rx.mini";
 import { keyboardAction, KeyboardAction } from "./model";
 import { useDispatch } from "react-redux";
 import { keyboardSwitch } from "../../../redux/devices";
+import {
+  AdvancedDynamicTexture,
+  InputText,
+  VirtualKeyboard,
+  Control
+} from "@babylonjs/gui";
 
 export type OnKeyboardMountProps = {
   keyboardActionEvent: Event<KeyboardAction>;
@@ -50,6 +50,7 @@ const Keyboard: FC<{
       input.height = "40px";
       input.color = "white";
       input.background = "green";
+      input.disableMobilePrompt = true;
       advancedTexture.addControl(input);
 
       const keyboard = VirtualKeyboard.CreateDefaultLayout();
@@ -59,7 +60,7 @@ const Keyboard: FC<{
       keyboard.connect(input);
 
       let textBuffer = input.text;
-      input.onTextChangedObservable.add(e => {
+      input.onTextChangedObservable.add((e: any) => {
         console.log({ e }, input.text);
 
         if (input.text === textBuffer.slice(0, -1)) {
