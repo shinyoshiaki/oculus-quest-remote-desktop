@@ -1,15 +1,7 @@
-import React, { useRef, useState, FC } from "react";
+import React, { useRef, useState, FC, Fragment } from "react";
 
 import SceneCreate, { SceneEventArgs } from "../domain/babylon/scene";
-import {
-  Vector3,
-  HemisphericLight,
-  FreeCamera,
-  MeshBuilder,
-  StandardMaterial,
-  CubeTexture,
-  Texture
-} from "@babylonjs/core";
+import { Vector3, HemisphericLight, FreeCamera } from "@babylonjs/core";
 import useInput from "../hooks/useInput";
 import { webrtcService } from "../services/webrtc";
 import Desktop, { OnDesktopMountProps } from "../domain/babylon/desktop";
@@ -17,10 +9,10 @@ import VR, { OnMountProps } from "../domain/babylon/vr";
 import Keyboard, { OnKeyboardMountProps } from "../domain/babylon/keyboard";
 import { ReduxState } from "../redux";
 import useSelectorRef from "../hooks/useSelectorRef";
+import Audio from "../domain/babylon/audio";
 
 const App: FC = () => {
   const [room, setroom, clearroom] = useInput();
-  const ref = useRef<any>();
   const [stream, setstream] = useState<MediaStream>();
 
   const onSceneMount = (e: SceneEventArgs) => {
@@ -56,8 +48,6 @@ const App: FC = () => {
     if (webrtcService.peer)
       webrtcService.peer.onAddTrack.subscribe(ms => {
         setstream(ms);
-        console.log(ms);
-        ref.current.srcObject = ms;
       });
   };
 
@@ -89,17 +79,19 @@ const App: FC = () => {
           <Keyboard onMount={onKeyboardMount} />
         </VR>
         {stream && (
-          <Desktop
-            stream={stream}
-            ratio={{
-              vertical: 2,
-              horizontal: 2 * 1.7
-            }}
-            onMount={onDesktopMount}
-          />
+          <Fragment>
+            <Desktop
+              stream={stream}
+              ratio={{
+                vertical: 2,
+                horizontal: 2 * 1.7
+              }}
+              onMount={onDesktopMount}
+            />
+            <Audio stream={stream} />
+          </Fragment>
         )}
       </SceneCreate>
-      <video ref={ref} autoPlay={true} width={100} height={100} />
     </div>
   );
 };
