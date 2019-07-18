@@ -8,29 +8,38 @@ const Grabable: FC<{}> = ({}) => {
   const context = useContext(SceneContext);
   const vrContext = useContext(VRContext)!;
 
-  const selectedMesh = useRef<AbstractMesh | null>();
+  const stateRef = useRef(
+    new (class {
+      selectedMesh?: AbstractMesh;
+    })()
+  );
 
   useAsyncEffect(async vrContext => {
+    const state = stateRef.current;
+    let { selectedMesh } = state;
+
     const VRHelper = vrContext.vrHelper;
+
     VRHelper.onControllerMeshLoaded.add(webVRController => {
       webVRController.onTriggerStateChangedObservable.add(stateObject => {
         if (stateObject.value > 0.01) {
-          if (selectedMesh && selectedMesh.current) {
-            webVRController.mesh!.addChild(selectedMesh.current);
+          if (selectedMesh) {
+            webVRController.mesh!.addChild(selectedMesh);
           }
         } else {
-          if (selectedMesh && selectedMesh.current) {
-            webVRController.mesh!.removeChild(selectedMesh.current);
+          if (selectedMesh) {
+            webVRController.mesh!.removeChild(selectedMesh);
           }
         }
       });
     });
     VRHelper.onNewMeshSelected.add(mesh => {
-      selectedMesh.current = mesh;
+      selectedMesh = mesh;
     });
     VRHelper.onSelectedMeshUnselected.add(() => {
-      selectedMesh.current = null;
+      selectedMesh = undefined;
     });
+    stateRef.current = state;
   }, vrContext);
 
   useAsyncEffect(context => {
