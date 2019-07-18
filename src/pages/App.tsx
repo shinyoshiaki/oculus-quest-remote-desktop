@@ -1,7 +1,7 @@
 import React, { useRef, useState, FC, Fragment } from "react";
 
 import SceneCreate, { SceneEventArgs } from "../domain/babylon/scene";
-import { Vector3, HemisphericLight, FreeCamera } from "@babylonjs/core";
+import { Vector3, HemisphericLight, FreeCamera, Camera } from "@babylonjs/core";
 import useInput from "../hooks/useInput";
 import { webrtcService } from "../services/webrtc";
 import Desktop, { OnDesktopMountProps } from "../domain/babylon/desktop";
@@ -10,10 +10,12 @@ import Keyboard, { OnKeyboardMountProps } from "../domain/babylon/keyboard";
 import { ReduxState } from "../redux";
 import useSelectorRef from "../hooks/useSelectorRef";
 import Audio from "../domain/babylon/audio";
+import Iframe from "../domain/babylon/iframe";
 
 const App: FC = () => {
   const [room, setroom, clearroom] = useInput();
   const [stream, setstream] = useState<MediaStream>();
+  const [camera, setcamera] = useState<Camera>();
 
   const onSceneMount = (e: SceneEventArgs) => {
     const { canvas, scene } = e;
@@ -22,6 +24,7 @@ const App: FC = () => {
 
     const camera = new FreeCamera("camera", new Vector3(0, 1, -2), scene);
     camera.attachControl(canvas, true);
+    setcamera(camera);
     (scene.activeCamera as any).beta += 0.8;
   };
 
@@ -76,6 +79,7 @@ const App: FC = () => {
       </div>
 
       <SceneCreate onSceneMount={onSceneMount} height={400} width={600}>
+        <Iframe camera={camera} />
         <VR onMount={onVRMount}>
           <Keyboard onMount={onKeyboardMount} />
         </VR>
