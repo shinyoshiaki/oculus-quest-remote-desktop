@@ -10,6 +10,7 @@ import Keyboard, { OnKeyboardMountProps } from "../domain/babylon/keyboard";
 import { ReduxState } from "../redux";
 import useSelectorRef from "../hooks/useSelectorRef";
 import Audio from "../domain/babylon/audio";
+import Grabable from "../domain/babylon/grabable";
 
 const App: FC = () => {
   const [room, setroom, clearroom] = useInput();
@@ -78,6 +79,7 @@ const App: FC = () => {
       <SceneCreate onSceneMount={onSceneMount} height={400} width={600}>
         <VR onMount={onVRMount}>
           <Keyboard onMount={onKeyboardMount} />
+          <Grabable />
         </VR>
         {stream && (
           <Fragment>

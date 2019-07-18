@@ -6,19 +6,14 @@ import React, {
   createContext
 } from "react";
 import { SceneContext } from "../scene";
-import {
-  Color3,
-  MeshBuilder,
-  StandardMaterial,
-  CubeTexture,
-  Texture
-} from "@babylonjs/core";
+import { CubeTexture, VRExperienceHelper } from "@babylonjs/core";
 import Event from "rx.mini";
 import { ControllerAction, VrPosition } from "./model";
 
 export type OnMountProps = {
   cotrollerActionEvent: Event<ControllerAction>;
   vrPositionEvent: Event<VrPosition>;
+  vrHelper: VRExperienceHelper;
 };
 
 export const VRContext = createContext<OnMountProps | undefined>(undefined);
@@ -78,7 +73,7 @@ const VR: FC<{
         vrPositionEvent.execute({ pos, qua });
       });
 
-      const props = { cotrollerActionEvent, vrPositionEvent };
+      const props = { cotrollerActionEvent, vrPositionEvent, vrHelper };
       if (onMount) onMount(props);
 
       setvrcontext(props);
