@@ -15,6 +15,9 @@ import Grabable from "../domain/babylon/grabable";
 const App: FC = () => {
   const [room, setroom, clearroom] = useInput();
   const [stream, setstream] = useState<MediaStream>();
+  const keyboardOpenRef = useSelectorRef(
+    (store: ReduxState) => store.devices.keyboardOpen
+  );
 
   const onSceneMount = (e: SceneEventArgs) => {
     const { canvas, scene } = e;
@@ -25,10 +28,6 @@ const App: FC = () => {
     camera.attachControl(canvas, true);
     (scene.activeCamera as any).beta += 0.8;
   };
-
-  const keyboardOpenRef = useSelectorRef(
-    (store: ReduxState) => store.devices.keyboardOpen
-  );
 
   const onDesktopMount = (props: OnDesktopMountProps) => {
     const { mouseMoveEvent } = props;

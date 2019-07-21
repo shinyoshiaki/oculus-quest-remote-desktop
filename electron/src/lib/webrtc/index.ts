@@ -34,7 +34,7 @@ export default class WebRTC {
   isOffer = false;
 
   remoteStream: MediaStream | undefined;
-  timeoutPing: NodeJS.Timeout | undefined;
+  timeoutPing: any | undefined;
 
   constructor(public opt: Partial<option> = {}) {
     const { nodeId, stream, track } = opt;

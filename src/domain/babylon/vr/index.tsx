@@ -9,6 +9,7 @@ import { SceneContext } from "../scene";
 import { CubeTexture, VRExperienceHelper } from "@babylonjs/core";
 import Event from "rx.mini";
 import { ControllerAction, VrPosition } from "./model";
+import useActive from "../../../hooks/useActive";
 
 export type OnMountProps = {
   cotrollerActionEvent: Event<ControllerAction>;
@@ -25,60 +26,55 @@ const VR: FC<{
 
   const [vrcontext, setvrcontext] = useState<OnMountProps | undefined>();
 
-  useEffect(() => {
-    if (context) {
-      const cotrollerActionEvent = new Event<ControllerAction>();
-      const vrPositionEvent = new Event<VrPosition>();
+  useActive(context => {
+    const cotrollerActionEvent = new Event<ControllerAction>();
+    const vrPositionEvent = new Event<VrPosition>();
 
-      const { scene } = context;
+    const { scene } = context;
 
-      const files = [
-        `${process.env.PUBLIC_URL}/textures/Space/space_left.jpg`,
-        `${process.env.PUBLIC_URL}/textures/Space/space_up.jpg`,
-        `${process.env.PUBLIC_URL}/textures/Space/space_front.jpg`,
-        `${process.env.PUBLIC_URL}/textures/Space/space_right.jpg`,
-        `${process.env.PUBLIC_URL}/textures/Space/space_down.jpg`,
-        `${process.env.PUBLIC_URL}/textures/Space/space_back.jpg`
-      ];
-      const texture = CubeTexture.CreateFromImages(files, scene);
+    const files = [
+      `${process.env.PUBLIC_URL}/textures/Space/space_left.jpg`,
+      `${process.env.PUBLIC_URL}/textures/Space/space_up.jpg`,
+      `${process.env.PUBLIC_URL}/textures/Space/space_front.jpg`,
+      `${process.env.PUBLIC_URL}/textures/Space/space_right.jpg`,
+      `${process.env.PUBLIC_URL}/textures/Space/space_down.jpg`,
+      `${process.env.PUBLIC_URL}/textures/Space/space_back.jpg`
+    ];
+    const texture = CubeTexture.CreateFromImages(files, scene);
 
-      const environment = scene.createDefaultEnvironment({
-        groundYBias: 1,
-        createSkybox: true,
-        skyboxSize: 150,
-        skyboxTexture: texture
-      })!;
+    const environment = scene.createDefaultEnvironment({
+      groundYBias: 1,
+      createSkybox: true,
+      skyboxSize: 150,
+      skyboxTexture: texture
+    })!;
 
-      const vrHelper = scene.createDefaultVRExperience({
-        createDeviceOrientationCamera: false
-      });
-      vrHelper.enableTeleportation({ floorMeshes: [environment.ground!] });
+    const vrHelper = scene.createDefaultVRExperience({
+      createDeviceOrientationCamera: false
+    });
+    vrHelper.enableTeleportation({ floorMeshes: [environment.ground!] });
 
-      vrHelper.onControllerMeshLoaded.add(webVRController => {
-        webVRController.onSecondaryButtonStateChangedObservable.add(
-          (data, _) => {
-            const hand = webVRController.hand;
-            if (hand === "right" || hand === "left") {
-              if (data.pressed) {
-                if (cotrollerActionEvent)
-                  cotrollerActionEvent.execute({ hand });
-              }
-            }
+    vrHelper.onControllerMeshLoaded.add(webVRController => {
+      webVRController.onSecondaryButtonStateChangedObservable.add((data, _) => {
+        const hand = webVRController.hand;
+        if (hand === "right" || hand === "left") {
+          if (data.pressed) {
+            if (cotrollerActionEvent) cotrollerActionEvent.execute({ hand });
           }
-        );
+        }
       });
-      scene.onBeforeRenderObservable.add(() => {
-        const pos = vrHelper.webVRCamera.devicePosition.clone();
-        const qua = vrHelper.webVRCamera.deviceRotationQuaternion.clone();
-        vrPositionEvent.execute({ pos, qua });
-      });
+    });
+    scene.onBeforeRenderObservable.add(() => {
+      const pos = vrHelper.webVRCamera.devicePosition.clone();
+      const qua = vrHelper.webVRCamera.deviceRotationQuaternion.clone();
+      vrPositionEvent.execute({ pos, qua });
+    });
 
-      const props = { cotrollerActionEvent, vrPositionEvent, vrHelper };
-      if (onMount) onMount(props);
+    const props = { cotrollerActionEvent, vrPositionEvent, vrHelper };
+    if (onMount) onMount(props);
 
-      setvrcontext(props);
-    }
-  }, [context]);
+    setvrcontext(props);
+  }, context);
 
   return (
     <VRContext.Provider value={vrcontext}>

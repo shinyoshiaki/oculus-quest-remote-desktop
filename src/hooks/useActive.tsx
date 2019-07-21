@@ -8,7 +8,7 @@ export default function useActive<U extends any[]>(
 ) {
   console.log([...bind])
   useEffect(() => {
-    const unexist = bind.filter(v => v == undefined || null);
+    const unexist = bind.filter(v => v === undefined || null);
     if (unexist.length === 0) fun(...(bind as any));
   }, [...bind]);
 }

@@ -1,12 +1,9 @@
 import React, { FC, Fragment, useContext, useRef } from "react";
-import { Mesh, AbstractMesh, Scene, StandardMaterial } from "@babylonjs/core";
-import { SceneContext } from "../scene";
-import { useAsyncEffect } from "../../../hooks/useAsyncEffect";
+import { AbstractMesh, OculusTouchController } from "@babylonjs/core";
 import { VRContext } from "../vr";
 import useActive from "../../../hooks/useActive";
 
-const Grabable: FC<{}> = ({}) => {
-  const context = useContext(SceneContext);
+const Grabable: FC = () => {
   const vrContext = useContext(VRContext);
 
   const stateRef = useRef(
@@ -15,53 +12,34 @@ const Grabable: FC<{}> = ({}) => {
     })()
   );
 
-  useActive(
-    (vrContext, context) => {
-      const state = stateRef.current;
-      let { selectedMesh } = state;
+  useActive(vrContext => {
+    const state = stateRef.current;
+    let { selectedMesh } = state;
 
-      const VRHelper = vrContext.vrHelper;
+    const VRHelper = vrContext.vrHelper;
 
-      VRHelper.onControllerMeshLoaded.add(webVRController => {
-        webVRController.onTriggerStateChangedObservable.add(stateObject => {
-          if (stateObject.value > 0.01) {
-            if (selectedMesh) {
+    VRHelper.onControllerMeshLoaded.add(webVRController => {
+      (webVRController as OculusTouchController).onSecondaryTriggerStateChangedObservable.add(
+        stateObject => {
+          if (selectedMesh && selectedMesh.name.split(":")[0] === "grab") {
+            if (stateObject.value > 0.01) {
               webVRController.mesh!.addChild(selectedMesh);
-            }
-          } else {
-            if (selectedMesh) {
+            } else {
               webVRController.mesh!.removeChild(selectedMesh);
             }
           }
-        });
-      });
-      VRHelper.onNewMeshSelected.add(mesh => {
-        selectedMesh = mesh;
-      });
-      VRHelper.onSelectedMeshUnselected.add(() => {
-        selectedMesh = undefined;
-      });
+        }
+      );
+    });
+    VRHelper.onNewMeshSelected.add(mesh => {
+      selectedMesh = mesh;
+    });
+    VRHelper.onSelectedMeshUnselected.add(() => {
+      selectedMesh = undefined;
+    });
 
-      createCubes(context.scene);
-
-      stateRef.current = state;
-    },
-    vrContext,
-    context
-  );
-
-  const createCubes = (scene: Scene) => {
-    const cubes: Mesh[] = [];
-    for (var i = 0; i < 4; i++) {
-      cubes.push(Mesh.CreateBox("cube" + i, 2, scene));
-      cubes[i].position.y = 1;
-      cubes[i].material = new StandardMaterial("cubeMat", scene);
-    }
-    cubes[0].position.z = 8;
-    cubes[1].position.x = 8;
-    cubes[2].position.x = -8;
-    cubes[3].position.z = -8;
-  };
+    stateRef.current = state;
+  }, vrContext);
 
   return <Fragment />;
 };
