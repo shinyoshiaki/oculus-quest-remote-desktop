@@ -3,10 +3,11 @@ import { Mesh, AbstractMesh, Scene, StandardMaterial } from "@babylonjs/core";
 import { SceneContext } from "../scene";
 import { useAsyncEffect } from "../../../hooks/useAsyncEffect";
 import { VRContext } from "../vr";
+import useActive from "../../../hooks/useActive";
 
 const Grabable: FC<{}> = ({}) => {
   const context = useContext(SceneContext);
-  const vrContext = useContext(VRContext)!;
+  const vrContext = useContext(VRContext);
 
   const stateRef = useRef(
     new (class {
@@ -14,38 +15,40 @@ const Grabable: FC<{}> = ({}) => {
     })()
   );
 
-  useAsyncEffect(async vrContext => {
-    const state = stateRef.current;
-    let { selectedMesh } = state;
+  useActive(
+    (vrContext, context) => {
+      const state = stateRef.current;
+      let { selectedMesh } = state;
 
-    const VRHelper = vrContext.vrHelper;
+      const VRHelper = vrContext.vrHelper;
 
-    VRHelper.onControllerMeshLoaded.add(webVRController => {
-      webVRController.onTriggerStateChangedObservable.add(stateObject => {
-        if (stateObject.value > 0.01) {
-          if (selectedMesh) {
-            webVRController.mesh!.addChild(selectedMesh);
+      VRHelper.onControllerMeshLoaded.add(webVRController => {
+        webVRController.onTriggerStateChangedObservable.add(stateObject => {
+          if (stateObject.value > 0.01) {
+            if (selectedMesh) {
+              webVRController.mesh!.addChild(selectedMesh);
+            }
+          } else {
+            if (selectedMesh) {
+              webVRController.mesh!.removeChild(selectedMesh);
+            }
           }
-        } else {
-          if (selectedMesh) {
-            webVRController.mesh!.removeChild(selectedMesh);
-          }
-        }
+        });
       });
-    });
-    VRHelper.onNewMeshSelected.add(mesh => {
-      selectedMesh = mesh;
-    });
-    VRHelper.onSelectedMeshUnselected.add(() => {
-      selectedMesh = undefined;
-    });
-    stateRef.current = state;
-  }, vrContext);
+      VRHelper.onNewMeshSelected.add(mesh => {
+        selectedMesh = mesh;
+      });
+      VRHelper.onSelectedMeshUnselected.add(() => {
+        selectedMesh = undefined;
+      });
 
-  useAsyncEffect(context => {
-    const { scene } = context!;
-    createCubes(scene);
-  }, context);
+      createCubes(context.scene);
+
+      stateRef.current = state;
+    },
+    vrContext,
+    context
+  );
 
   const createCubes = (scene: Scene) => {
     const cubes: Mesh[] = [];
